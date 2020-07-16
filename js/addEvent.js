@@ -1,6 +1,7 @@
 var eventModal = $('#eventModal');
 
 var modalTitle = $('.modal-title');
+var editPlace = $('#edit-place');
 var editAllDay = $('#edit-allDay');
 var editTitle = $('#edit-title');
 var editStart = $('#edit-start');
@@ -23,10 +24,11 @@ var newEvent = function (start, end, eventType) {
     modalTitle.html('새로운 일정');
     editType.val(eventType).prop('selected', true);
     editTitle.val('');
+    editPlace.val('');
     editStart.val(start);
     editEnd.val(end);
     editDesc.val('');
-    
+
     addBtnContainer.show();
     modifyBtnContainer.hide();
     eventModal.modal('show');
@@ -42,11 +44,12 @@ var newEvent = function (start, end, eventType) {
         var eventData = {
             _id: eventId,
             title: editTitle.val(),
+            place: editPlace.val(),
             start: editStart.val(),
             end: editEnd.val(),
             description: editDesc.val(),
             type: editType.val(),
-            username: '사나',
+            username: 'user03',
             backgroundColor: editColor.val(),
             textColor: '#ffffff',
             allDay: false

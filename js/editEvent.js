@@ -26,6 +26,7 @@ var editEvent = function (event, element, view) {
 
     modalTitle.html('일정 수정');
     editTitle.val(event.title);
+    editPlace.val(event.place);
     editStart.val(event.start.format('YYYY-MM-DD HH:mm'));
     editType.val(event.type);
     editDesc.val(event.description);
@@ -70,6 +71,7 @@ var editEvent = function (event, element, view) {
 
         event.allDay = statusAllDay;
         event.title = editTitle.val();
+        event.place = editPlace.val();
         event.start = startDate;
         event.end = displayDate;
         event.type = editType.val();
@@ -95,7 +97,7 @@ var editEvent = function (event, element, view) {
 
 // 삭제버튼
 $('#deleteEvent').on('click', function () {
-    
+
     $('#deleteEvent').unbind();
     $("#calendar").fullCalendar('removeEvents', $(this).data('id'));
     eventModal.modal('hide');
