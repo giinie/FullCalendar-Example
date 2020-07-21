@@ -86,6 +86,74 @@ function calDateWhenDragnDrop(event) {
     return newDates;
 }
 
+/////////////////////////////////////////////////
+// test repeat Begin
+var defaultEvents = [
+    {
+        // Just an event
+        title: 'Long Event',
+        start: '2020-08-07',
+        end: '2020-08-10',
+        className: 'scheduler_basic_event'
+    },
+    {
+        // Custom repeating event
+        id: 999,
+        title: 'Repeating Event',
+        start: '2020-08-09T16:00:00',
+        className: 'scheduler_basic_event'
+    },
+    {
+        // Custom repeating event
+        id: 999,
+        title: 'Repeating Event',
+        start: '2020-08-16T16:00:00',
+        className: 'scheduler_basic_event'
+    },
+    {
+        // Just an event
+        title: 'Lunch',
+        start: '2020-08-12T12:00:00',
+        className: 'scheduler_basic_event',
+    },
+    {
+        // Just an event
+        title: 'Happy Hour',
+        start: '2020-08-12T17:30:00',
+        className: 'scheduler_basic_event'
+    },
+    {
+        // Monthly event
+        id: 111,
+        title: 'Meeting',
+        start: '2000-01-01T00:00:00',
+        className: 'scheduler_basic_event',
+        repeat: 1
+    },
+    {
+        // Annual avent
+        id: 222,
+        title: 'Birthday Party',
+        start: '2020-08-04T07:00:00',
+        description: 'This is a cool event',
+        className: 'scheduler_basic_event',
+        repeat: 2
+    },
+    {
+        // Weekday event
+        title: 'Click for Google',
+        url: 'http://google.com/',
+        start: '2020-08-28',
+        className: 'scheduler_basic_event',
+        dow: [1, 5]
+    }
+];
+// Any value represanting monthly repeat flag
+var REPEAT_MONTHLY = 1;
+// Any value represanting yearly repeat flag
+var REPEAT_YEARLY = 2;
+// test repeat End
+/////////////////////////////////////////////////
 
 var calendar = $('#calendar').fullCalendar({
 
@@ -181,7 +249,7 @@ var calendar = $('#calendar').fullCalendar({
     },
 
     eventAfterAllRender: function (view) {
-        if (view.name == "month") {
+        if (view.name === "month") {
             $(".fc-content").css('height', 'auto');
         }
     },
@@ -260,7 +328,7 @@ var calendar = $('#calendar').fullCalendar({
 
         var today = moment();
 
-        if (view.name == "month") {
+        if (view.name === "month") {
             startDate.set({
                 hours: today.hours(),
                 minute: today.minutes()
@@ -303,6 +371,63 @@ var calendar = $('#calendar').fullCalendar({
     eventClick: function (event, jsEvent, view) {
         editEvent(event);
     },
+
+    ////////////////////////////////////////////////////////////////////////////
+    // repeat test
+    eventSources: [defaultEvents],
+    dayRender: function (date, cell) {
+        // Get all events
+        var events = $('#calendar').fullCalendar('clientEvents').length ? $('#calendar').fullCalendar('clientEvents') : defaultEvents;
+
+        // Start of a day timestamp
+        var dateTimestamp = date.hour(0).minutes(0);
+        var recurringEvents = [];
+
+        // find all events with monthly repeating flag, having id, repeating at that day few months ago
+        var monthlyEvents = events.filter(function (event) {
+            return event.repeat === REPEAT_MONTHLY &&
+                event.id &&
+                moment(event.start).hour(0).minutes(0).diff(dateTimestamp, 'months', true) % 1 == 0
+        });
+
+        // find all events with monthly repeating flag, having id, repeating at that day few years ago
+        var yearlyEvents = events.filter(function (event) {
+            return event.repeat === REPEAT_YEARLY &&
+                event.id &&
+                moment(event.start).hour(0).minutes(0).diff(dateTimestamp, 'years', true) % 1 == 0
+        });
+
+        recurringEvents = monthlyEvents.concat(yearlyEvents);
+
+        $.each(recurringEvents, function (key, event) {
+            var timeStart = moment(event.start);
+
+            // Refething event fields for event rendering
+            var eventData = {
+                id: event.id,
+                allDay: event.allDay,
+                title: event.title,
+                description: event.description,
+                start: date.hour(timeStart.hour()).minutes(timeStart.minutes()).format("YYYY-MM-DD"),
+                end: event.end ? event.end.format("YYYY-MM-DD") : "",
+                url: event.url,
+                className: 'scheduler_basic_event',
+                repeat: event.repeat
+            };
+
+            // Removing events to avoid duplication
+            $('#calendar').fullCalendar('removeEvents', function (event) {
+                return eventData.id === event.id &&
+                    moment(event.start).isSame(date, 'day');
+            });
+
+            // Render event
+            $('#calendar').fullCalendar('renderEvent', eventData, true);
+        });
+    },
+    // repeat test
+    ////////////////////////////////////////////////////////////////////////////
+
 
     locale: 'ko',
     timezone: "local",
