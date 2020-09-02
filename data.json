@@ -147,5 +147,24 @@
     "daysOfWeek": [1,4],
     "startRecur": "2020-07-15",
     "endRecur": "2020-09-01"
+  },
+  {
+    "_id": 12,
+    "groupId": "weekly M2",
+    "title": "주간 회의 2",
+    "place": "회의실 1",
+    "description": "과 주간 회의",
+    "start": "2020-07-15T09:00",
+    "end": "2020-07-15T10:00",
+    "startTime": "09:00",
+    "endTime": "10:00",
+    "type": "과 일정",
+    "username": "user02",
+    "backgroundColor": "#9775fa",
+    "textColor": "#ffffff",
+    "allDay": false,
+    "daysOfWeek": [2],
+    "startRecur": "2020-07-15",
+    "endRecur": "2020-09-01"
   }
 ]
